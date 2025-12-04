@@ -2,8 +2,7 @@ import {
     Type, AlignLeft, Hash,
     Sliders, Star,
     ChevronDown, CheckSquare, CircleDot, ToggleLeft,
-    Calendar, Clock, CalendarClock,
-    Palette
+    Calendar, Clock, CalendarClock
 } from 'lucide-react';
 
 export const FIELD_DEFINITIONS = {
@@ -13,8 +12,8 @@ export const FIELD_DEFINITIONS = {
         label: 'Short Answer',
         icon: Type,
         config: {
-            label: 'Short Answer',
-            placeholder: '',
+            label: 'Untitled Short Answer',
+            placeholder: 'untitled placeholder',
             defaultValue: '',
             helpText: '',
             validationType: 'none' // 'none', 'email', 'website', 'number'
@@ -22,7 +21,7 @@ export const FIELD_DEFINITIONS = {
         validation: {
             required: false,
             minLength: undefined,
-            maxLength: 200,
+            maxLength: 100,
             patternType: null, // 'regex' or null
             patternValue: '',
             patternErrorMessage: ''
@@ -33,8 +32,8 @@ export const FIELD_DEFINITIONS = {
         type: 'textarea',
         label: 'Paragraph',
         icon: AlignLeft,
-        config: { label: 'Paragraph', placeholder: '', defaultValue: '', helpText: '' },
-        validation: { required: false, minLength: undefined, maxLength: undefined },
+        config: { label: 'Untitled Paragraph', placeholder: 'untitled placeholder', defaultValue: '', helpText: '' },
+        validation: { required: false, minLength: undefined, maxLength: 300 },
         conditionalRules: []
     },
 
@@ -43,11 +42,11 @@ export const FIELD_DEFINITIONS = {
         type: 'number',
         label: 'Number',
         icon: Hash,
-        config: { label: 'Number', placeholder: '', defaultValue: undefined, decimalPlaces: 0, helpText: '' },
+        config: { label: 'Untitled Number', placeholder: 'untitled placeholder', defaultValue: undefined, decimalPlaces: 0, step: 1, helpText: '' },
         validation: {
             required: false,
-            min: undefined,
-            max: undefined,
+            min: 1,
+            max: 100,
             patternType: null,
             patternValue: '',
             patternErrorMessage: ''
@@ -58,16 +57,31 @@ export const FIELD_DEFINITIONS = {
         type: 'range',
         label: 'Slider',
         icon: Sliders,
-        config: { label: 'Slider', defaultValue: 50, showLabels: true, helpText: '' },
-        validation: { required: false, min: 0, max: 100 },
+        config: {
+            label: 'Untitled Slider',
+            defaultValue: 50,
+            step: 1,
+            showLabels: true,
+            showTooltip: false,
+            persistentTooltip: false,
+            helpText: ''
+        },
+        validation: { required: false, min: 1, max: 100 },
         conditionalRules: []
     },
     rating: {
         type: 'rating',
         label: 'Star Rating',
         icon: Star,
-        config: { label: 'Rating', defaultValue: 0, helpText: '' },
-        validation: { required: false, scale: 5 },
+        config: {
+            label: 'Untitled Star Rating',
+            defaultValue: 0,
+            maxStars: 5,
+            starSize: 'medium', // small, medium, large, custom
+            customStarSize: 24,
+            helpText: ''
+        },
+        validation: { required: false },
         conditionalRules: []
     },
 
@@ -77,10 +91,12 @@ export const FIELD_DEFINITIONS = {
         label: 'Dropdown',
         icon: ChevronDown,
         config: {
-            label: 'Select an option',
+            label: 'Untitled Dropdown',
+            placeholder: 'untitled placeholder',
             defaultValue: '',
             options: [{ label: 'Option 1', value: 'option1' }, { label: 'Option 2', value: 'option2' }],
             multiSelect: false,
+            allowOther: false,
             helpText: ''
         },
         validation: { required: false, allowCustom: false },
@@ -91,9 +107,10 @@ export const FIELD_DEFINITIONS = {
         label: 'Checkbox Group',
         icon: CheckSquare,
         config: {
-            label: 'Select options',
+            label: 'Untitled Checkbox Group',
             options: [{ label: 'Option 1', value: 'option1' }, { label: 'Option 2', value: 'option2' }],
             multiSelect: true,
+            allowOther: false,
             helpText: ''
         },
         validation: { required: false, minSelections: undefined, maxSelections: undefined },
@@ -104,9 +121,10 @@ export const FIELD_DEFINITIONS = {
         label: 'Radio Group',
         icon: CircleDot,
         config: {
-            label: 'Select one',
+            label: 'Untitled Radio Group',
             options: [{ label: 'Option 1', value: 'option1' }, { label: 'Option 2', value: 'option2' }],
             multiSelect: false,
+            allowOther: false,
             helpText: ''
         },
         validation: { required: false },
@@ -116,7 +134,7 @@ export const FIELD_DEFINITIONS = {
         type: 'toggle',
         label: 'Toggle',
         icon: ToggleLeft,
-        config: { label: 'Toggle', defaultValue: false, onLabel: 'On', offLabel: 'Off', toggleStyle: 'offset', helpText: '' },
+        config: { label: 'Untitled Toggle', defaultValue: false, onLabel: 'On', offLabel: 'Off', toggleStyle: 'offset', helpText: '' },
         validation: { required: false },
         conditionalRules: []
     },
@@ -126,7 +144,7 @@ export const FIELD_DEFINITIONS = {
         type: 'date',
         label: 'Date',
         icon: Calendar,
-        config: { label: 'Date', defaultValue: '', helpText: '' },
+        config: { label: 'Untitled Date', placeholder: 'untitled placeholder', defaultValue: '', dateFormat: 'YYYY-MM-DD', helpText: '' },
         validation: { required: false, minDate: undefined, maxDate: undefined, disabledDates: [] },
         conditionalRules: [],
         enableConditionalLogic: false
@@ -135,18 +153,8 @@ export const FIELD_DEFINITIONS = {
         type: 'time',
         label: 'Time',
         icon: Clock,
-        config: { label: 'Time', defaultValue: '', timeFormat: '24', helpText: '' },
+        config: { label: 'Untitled Time', placeholder: 'untitled placeholder', defaultValue: '', timeFormat: '24', helpText: '' },
         validation: { required: false, minTime: undefined, maxTime: undefined },
-        conditionalRules: []
-    },
-
-    // 5. Special Inputs
-    color: {
-        type: 'color',
-        label: 'Color Picker',
-        icon: Palette,
-        config: { label: 'Pick a color', defaultValue: '#000000', helpText: '' },
-        validation: { required: false },
         conditionalRules: []
     }
 };
@@ -155,6 +163,5 @@ export const FIELD_CATEGORIES = {
     'Text Inputs': ['text', 'textarea'],
     'Numerical': ['number', 'range', 'rating'],
     'Selection': ['dropdown', 'checkboxGroup', 'radioGroup', 'toggle'],
-    'Date & Time': ['date', 'time'],
-    'Special': ['color']
+    'Date & Time': ['date', 'time']
 };

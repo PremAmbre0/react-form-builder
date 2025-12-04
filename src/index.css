@@ -57,6 +57,12 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-muted-foreground opacity-100;
+    /* opacity-100 is needed for Firefox */
+  }
 }
 
 @layer utilities {

@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { getAccentColorHex } from '../../utils/colors';
 
-export default function CustomTimePicker({ value, onChange, onClose, accentColor }) {
-    const [selectedHour, setSelectedHour] = useState(12);
+export default function CustomTimePicker({ value, onChange, onClose, accentColor, format = '12', triggerRef }) {
+    const is24Hour = format === '24';
+    const [selectedHour, setSelectedHour] = useState(is24Hour ? 0 : 12);
     const [selectedMinute, setSelectedMinute] = useState(0);
     const [selectedPeriod, setSelectedPeriod] = useState('AM');
     const accentHex = getAccentColorHex(accentColor);
+    const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
 
     const ITEM_HEIGHT = 40;
     const CONTAINER_HEIGHT = 192; // h-48
@@ -18,7 +21,7 @@ export default function CustomTimePicker({ value, onChange, onClose, accentColor
     const lastEmittedValue = useRef(value);
 
     // Data
-    const hours = Array.from({ length: 12 }, (_, i) => i + 1);
+    const hours = is24Hour ? Array.from({ length: 24 }, (_, i) => i) : Array.from({ length: 12 }, (_, i) => i + 1);
     const minutes = Array.from({ length: 60 }, (_, i) => i);
     const periods = ['AM', 'PM'];
 
@@ -26,15 +29,46 @@ export default function CustomTimePicker({ value, onChange, onClose, accentColor
     const loopedHours = [...hours, ...hours, ...hours];
     const loopedMinutes = [...minutes, ...minutes, ...minutes];
 
+    // Calculate position with collision detection
+    useLayoutEffect(() => {
+        if (triggerRef?.current) {
+            const rect = triggerRef.current.getBoundingClientRect();
+            const PICKER_HEIGHT = 200; // Estimated height (192px + margin)
+            const spaceBelow = window.innerHeight - rect.bottom;
+
+            let topPosition;
+
+            // Check for bottom collision
+            if (spaceBelow < PICKER_HEIGHT) {
+                // Position above the field
+                topPosition = rect.top + window.scrollY - PICKER_HEIGHT - 8; // 8px gap
+            } else {
+                // Position below the field
+                topPosition = rect.bottom + window.scrollY;
+            }
+
+            setPosition({
+                top: topPosition,
+                left: rect.left + window.scrollX,
+                width: 256 // w-64
+            });
+        }
+    }, [triggerRef]);
+
     // Helper to parse date
     const parseDate = (val) => {
         const date = new Date(val);
         if (isNaN(date.getTime())) return null;
         let h = date.getHours();
         const m = date.getMinutes();
-        const p = h >= 12 ? 'PM' : 'AM';
-        h = h % 12;
-        h = h ? h : 12;
+        let p = 'AM';
+
+        if (!is24Hour) {
+            p = h >= 12 ? 'PM' : 'AM';
+            h = h % 12;
+            h = h ? h : 12;
+        }
+
         return { h, m, p };
     };
 
@@ -45,30 +79,24 @@ export default function CustomTimePicker({ value, onChange, onClose, accentColor
             if (parsed) {
                 setSelectedHour(parsed.h);
                 setSelectedMinute(parsed.m);
-                setSelectedPeriod(parsed.p);
+                if (!is24Hour) setSelectedPeriod(parsed.p);
             }
         }
-    }, [value]);
+    }, [value, is24Hour]);
 
-    // Scroll to current state on mount and when state changes (if needed for initial sync)
-    // We use useLayoutEffect to ensure it happens before paint if possible, avoiding jump
+    // Scroll to current state on mount and when state changes
     useLayoutEffect(() => {
         const syncScroll = () => {
             scrollToValue(hourRef, selectedHour, hours);
             scrollToValue(minuteRef, selectedMinute, minutes);
-            scrollToValue(periodRef, selectedPeriod, periods, false);
+            if (!is24Hour) scrollToValue(periodRef, selectedPeriod, periods, false);
         };
 
-        // We only want to force scroll if we haven't touched it yet? 
-        // Or just always sync on mount?
-        // Let's sync on mount.
         syncScroll();
-
-        // Also set a timeout to ensure it sticks after layout
         setTimeout(syncScroll, 10);
-    }, []); // Run once on mount
+    }, [is24Hour]);
 
-    // Also sync when value changes externally (handled by the useEffect above updating state, but we need to scroll too)
+    // Sync when value changes externally
     useEffect(() => {
         if (value && value !== lastEmittedValue.current) {
             const parsed = parseDate(value);
@@ -76,11 +104,11 @@ export default function CustomTimePicker({ value, onChange, onClose, accentColor
                 setTimeout(() => {
                     scrollToValue(hourRef, parsed.h, hours);
                     scrollToValue(minuteRef, parsed.m, minutes);
-                    scrollToValue(periodRef, parsed.p, periods, false);
+                    if (!is24Hour) scrollToValue(periodRef, parsed.p, periods, false);
                 }, 0);
             }
         }
-    }, [value]);
+    }, [value, is24Hour]);
 
     const scrollToValue = (ref, val, list, isLooped = true) => {
         if (ref.current) {
@@ -101,8 +129,12 @@ export default function CustomTimePicker({ value, onChange, onClose, accentColor
     const emitChange = (h, m, p) => {
         const date = new Date();
         let hours24 = h;
-        if (p === 'PM' && h !== 12) hours24 += 12;
-        if (p === 'AM' && h === 12) hours24 = 0;
+
+        if (!is24Hour) {
+            if (p === 'PM' && h !== 12) hours24 += 12;
+            if (p === 'AM' && h === 12) hours24 = 0;
+        }
+
         date.setHours(hours24, m, 0, 0);
 
         const iso = date.toISOString();
@@ -158,10 +190,16 @@ export default function CustomTimePicker({ value, onChange, onClose, accentColor
         });
     };
 
-    return (
+    return createPortal(
         <div
-            className="absolute z-50 mt-2 bg-popover text-popover-foreground rounded-lg shadow-xl border border-border w-64 animate-in fade-in zoom-in-95 duration-200 overflow-hidden select-none"
-            style={{ '--accent-color': accentHex }}
+            onMouseDown={(e) => e.preventDefault()} // Prevent focus loss on input when clicking picker
+            className="fixed z-[9999] mt-2 bg-popover text-popover-foreground rounded-lg shadow-xl border border-border animate-in fade-in zoom-in-95 duration-200 overflow-hidden select-none"
+            style={{
+                '--accent-color': accentHex,
+                top: position.top,
+                left: position.left,
+                width: position.width
+            }}
         >
 
             <div className="flex h-48 relative">
@@ -183,8 +221,8 @@ export default function CustomTimePicker({ value, onChange, onClose, accentColor
                                 key={`h-${i}`}
                                 onClick={(e) => handleClick(e, hour, hours, hourRef, 'hour')}
                                 className={`h-10 flex items-center justify-center cursor-pointer snap-center transition-all duration-200 ${selectedHour === hour
-                                        ? 'font-bold text-lg scale-110 text-foreground'
-                                        : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
+                                    ? 'font-bold text-lg scale-110 text-foreground'
+                                    : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
                                     }`}
                             >
                                 {hour.toString().padStart(2, '0')}
@@ -197,7 +235,7 @@ export default function CustomTimePicker({ value, onChange, onClose, accentColor
                 <div
                     ref={minuteRef}
                     onScroll={(e) => handleScroll(e, minutes, setSelectedMinute, 'minute')}
-                    className="flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory border-r border-border/50 relative"
+                    className={`flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory relative ${!is24Hour ? 'border-r border-border/50' : ''}`}
                 >
                     <div style={{ paddingTop: PADDING_Y, paddingBottom: PADDING_Y }}>
                         {loopedMinutes.map((minute, i) => (
@@ -205,8 +243,8 @@ export default function CustomTimePicker({ value, onChange, onClose, accentColor
                                 key={`m-${i}`}
                                 onClick={(e) => handleClick(e, minute, minutes, minuteRef, 'minute')}
                                 className={`h-10 flex items-center justify-center cursor-pointer snap-center transition-all duration-200 ${selectedMinute === minute
-                                        ? 'font-bold text-lg scale-110 text-foreground'
-                                        : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
+                                    ? 'font-bold text-lg scale-110 text-foreground'
+                                    : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
                                     }`}
                             >
                                 {minute.toString().padStart(2, '0')}
@@ -215,39 +253,42 @@ export default function CustomTimePicker({ value, onChange, onClose, accentColor
                     </div>
                 </div>
 
-                {/* AM/PM Column */}
-                <div
-                    ref={periodRef}
-                    onScroll={(e) => {
-                        const scrollTop = e.target.scrollTop;
-                        const index = Math.round(scrollTop / ITEM_HEIGHT);
-                        const val = periods[index];
-                        if (val && val !== selectedPeriod) {
-                            setSelectedPeriod(val);
-                            emitChange(selectedHour, selectedMinute, val);
-                        }
-                    }}
-                    className="flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory relative"
-                >
-                    <div style={{ paddingTop: PADDING_Y, paddingBottom: PADDING_Y }}>
-                        {periods.map((period, i) => (
-                            <div
-                                key={period}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    periodRef.current.scrollTo({ top: i * ITEM_HEIGHT, behavior: 'smooth' });
-                                }}
-                                className={`h-10 flex items-center justify-center cursor-pointer snap-center transition-all duration-200 ${selectedPeriod === period
+                {/* AM/PM Column (Only for 12h format) */}
+                {!is24Hour && (
+                    <div
+                        ref={periodRef}
+                        onScroll={(e) => {
+                            const scrollTop = e.target.scrollTop;
+                            const index = Math.round(scrollTop / ITEM_HEIGHT);
+                            const val = periods[index];
+                            if (val && val !== selectedPeriod) {
+                                setSelectedPeriod(val);
+                                emitChange(selectedHour, selectedMinute, val);
+                            }
+                        }}
+                        className="flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory relative"
+                    >
+                        <div style={{ paddingTop: PADDING_Y, paddingBottom: PADDING_Y }}>
+                            {periods.map((period, i) => (
+                                <div
+                                    key={period}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        periodRef.current.scrollTo({ top: i * ITEM_HEIGHT, behavior: 'smooth' });
+                                    }}
+                                    className={`h-10 flex items-center justify-center cursor-pointer snap-center transition-all duration-200 ${selectedPeriod === period
                                         ? 'font-bold text-lg scale-110 text-foreground'
                                         : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
-                                    }`}
-                            >
-                                {period}
-                            </div>
-                        ))}
+                                        }`}
+                                >
+                                    {period}
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

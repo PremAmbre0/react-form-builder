@@ -51,6 +51,30 @@ export default function PreviewPage() {
         }
     }, [id, loadForm]);
 
+    // Pre-populate Date & Time fields
+    useEffect(() => {
+        if (activeForm && activeForm.fields) {
+            const updates = {};
+            let hasUpdates = false;
+
+            activeForm.fields.forEach(field => {
+                if (!formData[field.id]) {
+                    if (field.type === 'date') {
+                        updates[field.id] = new Date().toISOString();
+                        hasUpdates = true;
+                    } else if (field.type === 'time') {
+                        updates[field.id] = new Date().toISOString();
+                        hasUpdates = true;
+                    }
+                }
+            });
+
+            if (hasUpdates) {
+                setFormData(prev => ({ ...prev, ...updates }));
+            }
+        }
+    }, [activeForm]); // Run when form loads
+
     if (!activeForm) {
         return (
             <div className="flex items-center justify-center h-screen">
@@ -139,7 +163,7 @@ export default function PreviewPage() {
                     <p className="text-muted-foreground mb-6 break-words whitespace-pre-wrap">{activeForm.description}</p>
                     <hr className={`border-t border-${activeForm.accentColor}/20 mb-8`} />
 
-                    <div className="space-y-[14px]">
+                    <div className="">
                         {activeForm.fields.length === 0 ? (
                             <p className="text-center text-muted-foreground italic">This form has no fields yet.</p>
                         ) : (
@@ -177,13 +201,27 @@ export default function PreviewPage() {
 
                     <hr className={`border-t border-${activeForm.accentColor}/20 my-8`} />
 
-                    <div className="">
+                    <div className="flex gap-4">
                         <button
                             onClick={handleSubmit}
                             disabled={hasErrors}
-                            className={`w-full bg-${activeForm.accentColor} text-white py-3 rounded-md font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`flex-1 bg-${activeForm.accentColor} text-white py-3 rounded-md font-semibold hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                             Submit
+                        </button>
+                        <button
+                            onClick={() => {
+                                setFormData({});
+                                setErrors({});
+                                // Re-populate defaults if needed, or just clear. 
+                                // User asked for "reset", usually implies back to initial state.
+                                // But for now, let's just clear.
+                                // Actually, if we want to support "default to current time", reset should probably re-trigger that.
+                                // Let's just clear for now as requested "reset the form".
+                            }}
+                            className="px-6 py-3 rounded-md font-semibold border border-border hover:bg-accent hover:text-accent-foreground transition-colors"
+                        >
+                            Reset
                         </button>
                     </div>
                 </div>

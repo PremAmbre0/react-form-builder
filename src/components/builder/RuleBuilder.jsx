@@ -1,6 +1,7 @@
 import React from 'react';
 import { Info } from 'lucide-react';
 import useFormStore from '../../store/useFormStore';
+import EditorDropdown from './EditorDropdown';
 
 export default function RuleBuilder({ field, updateField }) {
     const { activeForm } = useFormStore();
@@ -29,17 +30,17 @@ export default function RuleBuilder({ field, updateField }) {
     }
 
     return (
-        <div className="space-y-4 p-4 border border-border rounded-md bg-card">
+        <div className="space-y-4">
             <div className="space-y-2">
                 <label className="text-sm font-medium">Condition Type (Behavior)</label>
-                <select
+                <EditorDropdown
                     value={currentRule.action}
-                    onChange={(e) => handleActionChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
-                >
-                    <option value="Show">Show this field only when...</option>
-                    <option value="Enable">Enable this field only when...</option>
-                </select>
+                    options={[
+                        { label: 'Show this field only when...', value: 'Show' },
+                        { label: 'Enable this field only when...', value: 'Enable' },
+                    ]}
+                    onChange={(value) => handleActionChange(value)}
+                />
             </div>
 
             <div className="space-y-2">

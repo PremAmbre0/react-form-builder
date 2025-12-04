@@ -41,11 +41,10 @@ export default function FieldList() {
 
     return (
         <div className="flex flex-col h-full">
-            <div className="space-y-4">
+            <div className="">
                 {activeForm.fields.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-32 text-muted-foreground border-2 border-dashed border-border rounded-lg bg-accent/5">
-                        <p>No fields added yet.</p>
-                        <p className="text-sm">Click "Add Field" above to start.</p>
+                        <p>Add fields to the form</p>
                     </div>
                 ) : (
                     activeForm.fields.map((field) => {
@@ -93,10 +92,10 @@ export default function FieldList() {
                                             e.stopPropagation();
                                             removeField(field.id);
                                         }}
-                                        className="p-1.5 bg-destructive text-destructive-foreground rounded-md shadow-sm hover:bg-destructive/90 transition-colors"
+                                        className="p-1.5 text-muted-foreground hover:text-destructive transition-colors group/btn"
                                         title="Delete Field"
                                     >
-                                        <Trash2 size={16} />
+                                        <Trash2 size={18} className="transition-all group-hover/btn:stroke-[2.5px]" />
                                     </button>
                                 </div>
                             </div>
