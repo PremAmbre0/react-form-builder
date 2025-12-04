@@ -20,7 +20,7 @@ export const FIELD_DEFINITIONS = {
         },
         validation: {
             required: false,
-            minLength: undefined,
+            minLength: 1,
             maxLength: 100,
             patternType: null,
             patternValue: '',
@@ -33,7 +33,7 @@ export const FIELD_DEFINITIONS = {
         label: 'Paragraph',
         icon: AlignLeft,
         config: { label: 'Untitled Paragraph', placeholder: 'untitled placeholder', defaultValue: '', helpText: '' },
-        validation: { required: false, minLength: undefined, maxLength: 300 },
+        validation: { required: false, minLength: 1, maxLength: 300 },
         conditionalRules: []
     },
 
