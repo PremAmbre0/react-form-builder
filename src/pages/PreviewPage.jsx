@@ -19,8 +19,6 @@ import ToggleInput from '../components/fields/ToggleInput';
 import DateInput from '../components/fields/DateInput';
 import TimeInput from '../components/fields/TimeInput';
 
-import ColorPickerInput from '../components/fields/ColorPickerInput';
-
 const FIELD_COMPONENTS = {
     text: TextInput,
     textarea: TextArea,
@@ -32,9 +30,7 @@ const FIELD_COMPONENTS = {
     radioGroup: RadioGroup,
     toggle: ToggleInput,
     date: DateInput,
-    time: TimeInput,
-
-    color: ColorPickerInput
+    time: TimeInput
 };
 
 export default function PreviewPage() {

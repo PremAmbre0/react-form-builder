@@ -16,7 +16,7 @@ import ToggleInput from '../fields/ToggleInput';
 import DateInput from '../fields/DateInput';
 import TimeInput from '../fields/TimeInput';
 
-import ColorPickerInput from '../fields/ColorPickerInput';
+
 
 const FIELD_COMPONENTS = {
     text: TextInput,
@@ -29,9 +29,7 @@ const FIELD_COMPONENTS = {
     radioGroup: RadioGroup,
     toggle: ToggleInput,
     date: DateInput,
-    time: TimeInput,
-
-    color: ColorPickerInput
+    time: TimeInput
 };
 
 export default function FieldList() {

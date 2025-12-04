@@ -2,11 +2,11 @@ import {
     Type, AlignLeft, Hash,
     Sliders, Star,
     ChevronDown, CheckSquare, CircleDot, ToggleLeft,
-    Calendar, Clock, CalendarClock
+    Calendar, Clock
 } from 'lucide-react';
 
 export const FIELD_DEFINITIONS = {
-    // 1. Text Inputs (Merged)
+    // 1. Text Inputs
     text: {
         type: 'text',
         label: 'Short Answer',
@@ -16,13 +16,13 @@ export const FIELD_DEFINITIONS = {
             placeholder: 'untitled placeholder',
             defaultValue: '',
             helpText: '',
-            validationType: 'none' // 'none', 'email', 'website', 'number'
+            validationType: 'none'
         },
         validation: {
             required: false,
             minLength: undefined,
             maxLength: 100,
-            patternType: null, // 'regex' or null
+            patternType: null,
             patternValue: '',
             patternErrorMessage: ''
         },
@@ -42,7 +42,7 @@ export const FIELD_DEFINITIONS = {
         type: 'number',
         label: 'Number',
         icon: Hash,
-        config: { label: 'Untitled Number', placeholder: 'untitled placeholder', defaultValue: undefined, decimalPlaces: 0, step: 1, helpText: '' },
+        config: { label: 'Untitled Number', placeholder: '0', defaultValue: undefined, decimalPlaces: 0, step: 1, helpText: '' },
         validation: {
             required: false,
             min: 1,
@@ -77,7 +77,7 @@ export const FIELD_DEFINITIONS = {
             label: 'Untitled Star Rating',
             defaultValue: 0,
             maxStars: 5,
-            starSize: 'medium', // small, medium, large, custom
+            starSize: 'medium',
             customStarSize: 24,
             helpText: ''
         },
@@ -92,7 +92,7 @@ export const FIELD_DEFINITIONS = {
         icon: ChevronDown,
         config: {
             label: 'Untitled Dropdown',
-            placeholder: 'untitled placeholder',
+            placeholder: 'Select an option',
             defaultValue: '',
             options: [{ label: 'Option 1', value: 'option1' }, { label: 'Option 2', value: 'option2' }],
             multiSelect: false,
@@ -144,7 +144,7 @@ export const FIELD_DEFINITIONS = {
         type: 'date',
         label: 'Date',
         icon: Calendar,
-        config: { label: 'Untitled Date', placeholder: 'untitled placeholder', defaultValue: '', dateFormat: 'YYYY-MM-DD', helpText: '' },
+        config: { label: 'Untitled Date', placeholder: 'Select date', defaultValue: '', dateFormat: 'YYYY-MM-DD', helpText: '' },
         validation: { required: false, minDate: undefined, maxDate: undefined, disabledDates: [] },
         conditionalRules: [],
         enableConditionalLogic: false
@@ -153,7 +153,7 @@ export const FIELD_DEFINITIONS = {
         type: 'time',
         label: 'Time',
         icon: Clock,
-        config: { label: 'Untitled Time', placeholder: 'untitled placeholder', defaultValue: '', timeFormat: '24', helpText: '' },
+        config: { label: 'Untitled Time', placeholder: 'Select time', defaultValue: '', timeFormat: '24', helpText: '' },
         validation: { required: false, minTime: undefined, maxTime: undefined },
         conditionalRules: []
     }
