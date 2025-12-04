@@ -7,12 +7,27 @@ import FieldConfigEditor from './FieldConfigEditor';
 
 export default function ContextualSidebar() {
     const { sidebarMode, closeSidebar, activeForm, selectedFieldId, updateField } = useFormStore();
+    const sidebarRef = React.useRef(null);
 
     const selectedField = activeForm?.fields.find(f => f.id === selectedFieldId);
     const isOpen = sidebarMode !== null;
 
+    React.useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isOpen && sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+                closeSidebar();
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen, closeSidebar]);
+
     return (
         <div
+            ref={sidebarRef}
             className={cn(
                 "fixed top-0 right-0 h-full w-[500px] bg-card border-l border-border shadow-xl transform transition-transform duration-300 ease-in-out z-50",
                 isOpen ? "translate-x-0" : "translate-x-full"
