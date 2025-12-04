@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn } from '../utils/cn';
 
 export default function Layout({ children }) {
@@ -33,12 +34,12 @@ export default function Layout({ children }) {
         <div className="min-h-screen bg-background text-foreground font-sans antialiased transition-colors duration-300">
             <header className="border-b border-border sticky top-0 z-50 bg-background/80 backdrop-blur-sm">
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                         <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                             <span className="text-primary-foreground font-bold text-xl">F</span>
                         </div>
                         <h1 className="text-xl font-bold tracking-tight">FormBuilder</h1>
-                    </div>
+                    </Link>
                     <button
                         onClick={toggleTheme}
                         className="p-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"

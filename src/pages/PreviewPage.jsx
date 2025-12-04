@@ -153,7 +153,7 @@ export default function PreviewPage() {
             </div>
 
             <div className="bg-card border border-border rounded-xl shadow-lg relative">
-                <div className={`absolute top-0 left-0 w-full h-2 bg-${activeForm.accentColor}`} />
+                <div className={`absolute top-0 left-0 w-full h-2 bg-${activeForm.accentColor} rounded-t-xl`} />
                 <div className="p-8 pt-10">
                     <h1 className="text-3xl font-bold mb-2 break-words">{activeForm.title}</h1>
                     <p className="text-muted-foreground mb-6 break-words whitespace-pre-wrap">{activeForm.description}</p>
