@@ -1,5 +1,6 @@
 import React from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, AlertTriangle } from 'lucide-react';
+import RuleBuilder from './RuleBuilder';
 
 export default function FieldConfigEditor({ field, updateField }) {
     const { type, config, validation } = field;
@@ -32,6 +33,9 @@ export default function FieldConfigEditor({ field, updateField }) {
         handleConfigChange('options', newOptions);
     };
 
+    // Check for invalid Min/Max configuration
+    const isMinMaxInvalid = validation.min !== undefined && validation.max !== undefined && validation.min > validation.max;
+
     return (
         <div className="space-y-4 p-1">
             {/* Common Configuration */}
@@ -57,104 +61,9 @@ export default function FieldConfigEditor({ field, updateField }) {
                         placeholder="Description or instructions for the user"
                     />
                 </div>
-            </div>
 
-            {/* Type Specific Configuration */}
-            <div className="space-y-3 pt-2 border-t border-border/50">
-                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Settings</h4>
-
-                {/* Placeholder (Text, Number, Textarea) */}
-                {['text', 'number', 'textarea'].includes(type) && (
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-muted-foreground">Placeholder</label>
-                        <input
-                            type="text"
-                            value={config.placeholder || ''}
-                            onChange={(e) => handleConfigChange('placeholder', e.target.value)}
-                            className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
-                        />
-                    </div>
-                )}
-
-                {/* Validation Type (Text) */}
-                {type === 'text' && (
-                    <div className="space-y-1.5">
-                        <label className="text-xs font-medium text-muted-foreground">Validation Type</label>
-                        <select
-                            value={config.validationType || 'none'}
-                            onChange={(e) => handleConfigChange('validationType', e.target.value)}
-                            className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
-                        >
-                            <option value="none">None (Text)</option>
-                            <option value="email">Email</option>
-                            <option value="website">Website (URL)</option>
-                            <option value="number">Number (Numeric String)</option>
-                        </select>
-                    </div>
-                )}
-
-                {/* Options (Dropdown, Checkbox, Radio) */}
-                {['dropdown', 'checkboxGroup', 'radioGroup'].includes(type) && (
-                    <div className="space-y-2">
-                        <label className="text-xs font-medium text-muted-foreground">Options</label>
-                        <div className="space-y-2">
-                            {config.options?.map((option, index) => (
-                                <div key={index} className="flex items-center gap-2">
-                                    <input
-                                        type="text"
-                                        value={option.label}
-                                        onChange={(e) => updateOption(index, 'label', e.target.value)}
-                                        className="flex-1 px-2 py-1.5 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
-                                        placeholder="Option Label"
-                                    />
-                                    <button
-                                        onClick={() => removeOption(index)}
-                                        className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </div>
-                            ))}
-                            <button
-                                onClick={addOption}
-                                className="flex items-center gap-1 text-xs text-primary hover:underline font-medium"
-                            >
-                                <Plus size={14} /> Add Option
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Toggle Labels */}
-                {type === 'toggle' && (
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-muted-foreground">On Label</label>
-                            <input
-                                type="text"
-                                value={config.onLabel || 'On'}
-                                onChange={(e) => handleConfigChange('onLabel', e.target.value)}
-                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-muted-foreground">Off Label</label>
-                            <input
-                                type="text"
-                                value={config.offLabel || 'Off'}
-                                onChange={(e) => handleConfigChange('offLabel', e.target.value)}
-                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
-                            />
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Validation */}
-            <div className="space-y-3 pt-2 border-t border-border/50">
-                <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Validation</h4>
-
-                <div className="flex items-center gap-2">
+                {/* Required Field (Moved from Validation) */}
+                <div className="flex items-center gap-2 pt-1">
                     <input
                         type="checkbox"
                         id={`required-${field.id}`}
@@ -164,53 +73,311 @@ export default function FieldConfigEditor({ field, updateField }) {
                     />
                     <label htmlFor={`required-${field.id}`} className="text-sm font-medium cursor-pointer select-none">Required Field</label>
                 </div>
+            </div>
 
-                {/* Min/Max Length (Text types) */}
-                {['text'].includes(type) && (
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-muted-foreground">Min Length</label>
-                            <input
-                                type="number"
-                                value={validation.minLength || ''}
-                                onChange={(e) => handleValidationChange('minLength', e.target.value ? parseInt(e.target.value) : undefined)}
-                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-muted-foreground">Max Length</label>
-                            <input
-                                type="number"
-                                value={validation.maxLength || ''}
-                                onChange={(e) => handleValidationChange('maxLength', e.target.value ? parseInt(e.target.value) : undefined)}
-                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
-                            />
-                        </div>
-                    </div>
-                )}
+            {/* Type Specific Configuration */}
+            {['text', 'number', 'textarea', 'dropdown', 'checkboxGroup', 'radioGroup', 'toggle'].includes(type) && (
+                <div className="space-y-3 pt-2 border-t border-border/50">
+                    <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Settings</h4>
 
-                {/* Min/Max Value (Number, Range) */}
-                {['number', 'range'].includes(type) && (
-                    <div className="grid grid-cols-2 gap-3">
+                    {/* Placeholder (Text, Number, Textarea) */}
+                    {['text', 'number', 'textarea'].includes(type) && (
                         <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-muted-foreground">Min</label>
+                            <label className="text-xs font-medium text-muted-foreground">Placeholder</label>
                             <input
-                                type="number"
-                                value={validation.min !== undefined ? validation.min : ''}
-                                onChange={(e) => handleValidationChange('min', e.target.value ? parseFloat(e.target.value) : undefined)}
-                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
+                                type="text"
+                                value={config.placeholder || ''}
+                                onChange={(e) => handleConfigChange('placeholder', e.target.value)}
+                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
                             />
                         </div>
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-muted-foreground">Max</label>
-                            <input
-                                type="number"
-                                value={validation.max !== undefined ? validation.max : ''}
-                                onChange={(e) => handleValidationChange('max', e.target.value ? parseFloat(e.target.value) : undefined)}
-                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
-                            />
+                    )}
+
+                    {/* Validation Type (Text) */}
+                    {type === 'text' && (
+                        <div className="space-y-3">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-medium text-muted-foreground">Validation Type</label>
+                                <select
+                                    value={config.validationType || 'none'}
+                                    onChange={(e) => handleConfigChange('validationType', e.target.value)}
+                                    className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all"
+                                >
+                                    <option value="none">None (Text)</option>
+                                    <option value="email">Email</option>
+                                    <option value="website">Website (URL)</option>
+                                    <option value="number">Number (Numeric String)</option>
+                                    <option value="regex">Custom Regex Pattern</option>
+                                </select>
+                            </div>
+
+                            {/* Regex Configuration */}
+                            {config.validationType === 'regex' && (
+                                <div className="space-y-3 pl-2 border-l-2 border-primary/20 ml-1">
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-medium text-muted-foreground">Regex Pattern</label>
+                                        <input
+                                            type="text"
+                                            value={validation.patternValue || ''}
+                                            onChange={(e) => handleValidationChange('patternValue', e.target.value)}
+                                            className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary font-mono"
+                                            placeholder="e.g. ^\d{4}-\d{4}$"
+                                        />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-medium text-muted-foreground">Error Message</label>
+                                        <input
+                                            type="text"
+                                            value={validation.patternErrorMessage || ''}
+                                            onChange={(e) => handleValidationChange('patternErrorMessage', e.target.value)}
+                                            className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
+                                            placeholder="Custom error message"
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
+                    )}
+
+                    {/* Options (Dropdown, Checkbox, Radio) */}
+                    {['dropdown', 'checkboxGroup', 'radioGroup'].includes(type) && (
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-medium text-muted-foreground">Options</label>
+                                <div className="space-y-2">
+                                    {config.options?.map((option, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                value={option.label}
+                                                onChange={(e) => updateOption(index, 'label', e.target.value)}
+                                                className="flex-1 px-2 py-1.5 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
+                                                placeholder="Option Label"
+                                            />
+                                            {config.options.length > 2 && (
+                                                <button
+                                                    onClick={() => removeOption(index)}
+                                                    className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                    <button
+                                        onClick={addOption}
+                                        className="flex items-center gap-1 text-xs text-primary hover:underline font-medium"
+                                    >
+                                        <Plus size={14} /> Add Option
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Multi-select Toggle */}
+                            {['dropdown', 'checkboxGroup'].includes(type) && (
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id={`multi-${field.id}`}
+                                        checked={config.multiSelect !== undefined ? config.multiSelect : (type === 'checkboxGroup')}
+                                        onChange={(e) => handleConfigChange('multiSelect', e.target.checked)}
+                                        className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                                    />
+                                    <label htmlFor={`multi-${field.id}`} className="text-sm font-medium cursor-pointer select-none">Allow Multiple Selections</label>
+                                </div>
+                            )}
+
+                            {/* Min/Max Selections (Multi-select fields) */}
+                            {config.multiSelect && (
+                                <div className="space-y-2 pt-2 border-t border-border/50">
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-medium text-muted-foreground">Min Selections</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={validation.minSelections !== undefined ? validation.minSelections : ''}
+                                                onChange={(e) => handleValidationChange('minSelections', e.target.value ? parseInt(e.target.value) : undefined)}
+                                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
+                                            />
+                                        </div>
+                                        <div className="space-y-1.5">
+                                            <label className="text-xs font-medium text-muted-foreground">Max Selections</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={validation.maxSelections !== undefined ? validation.maxSelections : ''}
+                                                onChange={(e) => handleValidationChange('maxSelections', e.target.value ? parseInt(e.target.value) : undefined)}
+                                                className={`w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:border-primary ${validation.maxSelections > config.options.length ? 'border-destructive focus:border-destructive text-destructive' : 'border-input'}`}
+                                            />
+                                        </div>
+                                    </div>
+                                    {validation.maxSelections > config.options.length && (
+                                        <div className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 p-2 rounded-md">
+                                            <AlertTriangle size={14} />
+                                            <span>Max Selections cannot exceed total options ({config.options.length}).</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Allow Other Option Toggle */}
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id={`other-${field.id}`}
+                                    checked={config.allowOther || false}
+                                    onChange={(e) => handleConfigChange('allowOther', e.target.checked)}
+                                    className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
+                                    disabled={type === 'dropdown' && !config.multiSelect && false} // Just explicitly showing it's allowed for single select too
+                                />
+                                <label htmlFor={`other-${field.id}`} className="text-sm font-medium cursor-pointer select-none">Allow "Other" Option</label>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Toggle Labels */}
+                    {type === 'toggle' && (
+                        <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-muted-foreground">On Label</label>
+                                    <input
+                                        type="text"
+                                        value={config.onLabel || 'On'}
+                                        onChange={(e) => handleConfigChange('onLabel', e.target.value)}
+                                        className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-muted-foreground">Off Label</label>
+                                    <input
+                                        type="text"
+                                        value={config.offLabel || 'Off'}
+                                        onChange={(e) => handleConfigChange('offLabel', e.target.value)}
+                                        className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Toggle Style */}
+                            <div className="space-y-2 pt-2 border-t border-border/50">
+                                <label className="text-xs font-medium text-muted-foreground">Toggle Style</label>
+                                <div className="flex items-center gap-4">
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name={`toggleStyle-${field.id}`}
+                                            checked={config.toggleStyle !== 'inset'} // Default to offset
+                                            onChange={() => handleConfigChange('toggleStyle', 'offset')}
+                                            className="h-4 w-4 border-input text-primary focus:ring-primary"
+                                        />
+                                        <span className="text-sm">Offset</span>
+                                    </label>
+                                    <label className="flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name={`toggleStyle-${field.id}`}
+                                            checked={config.toggleStyle === 'inset'}
+                                            onChange={() => handleConfigChange('toggleStyle', 'inset')}
+                                            className="h-4 w-4 border-input text-primary focus:ring-primary"
+                                        />
+                                        <span className="text-sm">Inset</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Validation */}
+            {!['dropdown', 'checkboxGroup', 'radioGroup', 'toggle'].includes(type) && (
+                <div className="space-y-3 pt-2 border-t border-border/50">
+                    <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Validation</h4>
+
+                    {/* Min/Max Length (Text types) */}
+                    {['text', 'textarea'].includes(type) && config.validationType !== 'number' && (
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-medium text-muted-foreground">Min Length</label>
+                                <input
+                                    type="number"
+                                    value={validation.minLength || ''}
+                                    onChange={(e) => handleValidationChange('minLength', e.target.value ? parseInt(e.target.value) : undefined)}
+                                    className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-medium text-muted-foreground">Max Length</label>
+                                <input
+                                    type="number"
+                                    value={validation.maxLength || ''}
+                                    onChange={(e) => handleValidationChange('maxLength', e.target.value ? parseInt(e.target.value) : undefined)}
+                                    className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Min/Max Value (Number, Range, Rating OR Text with Number Validation) */}
+                    {(['number', 'range', 'rating'].includes(type) || (type === 'text' && config.validationType === 'number')) && (
+                        <div className="space-y-2">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-muted-foreground">Min Value</label>
+                                    <input
+                                        type="number"
+                                        value={validation.min !== undefined ? validation.min : ''}
+                                        onChange={(e) => handleValidationChange('min', e.target.value ? parseFloat(e.target.value) : undefined)}
+                                        className={`w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:border-primary ${isMinMaxInvalid ? 'border-destructive focus:border-destructive text-destructive' : 'border-input'}`}
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-medium text-muted-foreground">Max Value</label>
+                                    <input
+                                        type="number"
+                                        value={validation.max !== undefined ? validation.max : ''}
+                                        onChange={(e) => handleValidationChange('max', e.target.value ? parseFloat(e.target.value) : undefined)}
+                                        className={`w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none focus:border-primary ${isMinMaxInvalid ? 'border-destructive focus:border-destructive text-destructive' : 'border-input'}`}
+                                    />
+                                </div>
+                            </div>
+                            {isMinMaxInvalid && (
+                                <div className="flex items-center gap-2 text-xs text-destructive bg-destructive/10 p-2 rounded-md">
+                                    <AlertTriangle size={14} />
+                                    <span>Min Value cannot be greater than Max Value.</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Conditional Logic */}
+            <div className="space-y-3 pt-2 border-t border-border/50">
+                <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Conditional Logic</h4>
+                    <div className="flex items-center gap-2">
+                        <label htmlFor={`logic-${field.id}`} className="text-xs font-medium cursor-pointer select-none text-muted-foreground">
+                            {field.enableConditionalLogic ? 'Enabled' : 'Disabled'}
+                        </label>
+                        <button
+                            id={`logic-${field.id}`}
+                            onClick={() => updateField(field.id, { enableConditionalLogic: !field.enableConditionalLogic })}
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${field.enableConditionalLogic ? 'bg-primary' : 'bg-input'
+                                }`}
+                        >
+                            <span
+                                className={`pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform ${field.enableConditionalLogic ? 'translate-x-4' : 'translate-x-0.5'
+                                    }`}
+                            />
+                        </button>
                     </div>
+                </div>
+
+                {field.enableConditionalLogic && (
+                    <RuleBuilder field={field} updateField={updateField} />
                 )}
             </div>
         </div>

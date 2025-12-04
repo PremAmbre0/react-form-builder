@@ -4,6 +4,7 @@ import useFormStore from '../store/useFormStore';
 import { ArrowLeft, Edit } from 'lucide-react';
 import SubmissionModal from '../components/ui/SubmissionModal';
 import { validateField } from '../utils/validation';
+import { isFieldVisible, isFieldEnabled, cleanDataBeforeSubmit } from '../utils/rules';
 
 // Field Components
 import TextInput from '../components/fields/TextInput';
@@ -17,7 +18,7 @@ import RadioGroup from '../components/fields/RadioGroup';
 import ToggleInput from '../components/fields/ToggleInput';
 import DateInput from '../components/fields/DateInput';
 import TimeInput from '../components/fields/TimeInput';
-import DateTimeInput from '../components/fields/DateTimeInput';
+
 import ColorPickerInput from '../components/fields/ColorPickerInput';
 
 const FIELD_COMPONENTS = {
@@ -32,7 +33,7 @@ const FIELD_COMPONENTS = {
     toggle: ToggleInput,
     date: DateInput,
     time: TimeInput,
-    'datetime-local': DateTimeInput,
+
     color: ColorPickerInput
 };
 
@@ -83,6 +84,16 @@ export default function PreviewPage() {
         let hasError = false;
 
         activeForm.fields.forEach((field) => {
+            // Check visibility
+            if (field.enableConditionalLogic && !isFieldVisible(field, activeForm.fields, formData)) {
+                return; // Skip hidden fields
+            }
+
+            // Check enablement
+            if (field.enableConditionalLogic && !isFieldEnabled(field, activeForm.fields, formData)) {
+                return; // Skip disabled fields
+            }
+
             const value = formData[field.id];
             const error = validateField(field, value);
             if (error) {
@@ -94,6 +105,8 @@ export default function PreviewPage() {
         setErrors(newErrors);
 
         if (!hasError) {
+            const cleanedData = cleanDataBeforeSubmit(formData, activeForm.fields);
+            console.log('Form Submission Payload:', cleanedData);
             setIsModalOpen(true);
         }
     };
@@ -133,6 +146,16 @@ export default function PreviewPage() {
                             activeForm.fields.map((field, index) => {
                                 const Component = FIELD_COMPONENTS[field.type];
                                 if (!Component) return null;
+
+                                // Check Visibility
+                                if (field.enableConditionalLogic && !isFieldVisible(field, activeForm.fields, formData)) {
+                                    return null;
+                                }
+
+                                // Check Enablement
+                                const isEnabled = field.enableConditionalLogic
+                                    ? isFieldEnabled(field, activeForm.fields, formData)
+                                    : true;
                                 const isLast = index === activeForm.fields.length - 1;
 
                                 return (
@@ -145,6 +168,7 @@ export default function PreviewPage() {
                                         error={errors[field.id]}
                                         accentColor={activeForm.accentColor}
                                         isLast={isLast}
+                                        disabled={!isEnabled}
                                     />
                                 );
                             })

@@ -1,6 +1,7 @@
 import React from 'react';
 import useFormStore from '../../store/useFormStore';
 import { X } from 'lucide-react';
+import { cn } from '../../utils/cn';
 import FieldPicker from './FieldPicker';
 import FieldConfigEditor from './FieldConfigEditor';
 
@@ -8,16 +9,14 @@ export default function ContextualSidebar() {
     const { sidebarMode, closeSidebar, activeForm, selectedFieldId, updateField } = useFormStore();
 
     const selectedField = activeForm?.fields.find(f => f.id === selectedFieldId);
-
-    // If mode is null, render nothing (or handle animation externally, but here we can just return null for now if we don't want to keep it in DOM)
-    // For slide-in animation, it's better to keep it in DOM and toggle classes.
-
     const isOpen = sidebarMode !== null;
 
     return (
         <div
-            className={`fixed top-0 right-0 h-full w-80 bg-card border-l border-border shadow-xl transform transition-transform duration-300 ease-in-out z-50 ${isOpen ? 'translate-x-0' : 'translate-x-full'
-                }`}
+            className={cn(
+                "fixed top-0 right-0 h-full w-[500px] bg-card border-l border-border shadow-xl transform transition-transform duration-300 ease-in-out z-50",
+                isOpen ? "translate-x-0" : "translate-x-full"
+            )}
         >
             {/* Close Button */}
             <button

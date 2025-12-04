@@ -14,6 +14,15 @@ export default function FormHeader() {
 
     if (!activeForm) return null;
 
+    const textareaRef = React.useRef(null);
+
+    React.useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+        }
+    }, [activeForm.description]);
+
     return (
         <div
             className="space-y-4"
@@ -27,15 +36,12 @@ export default function FormHeader() {
                 placeholder="Form Title"
             />
             <textarea
+                ref={textareaRef}
                 value={activeForm.description}
                 onChange={(e) => updateFormMetadata({ description: e.target.value })}
-                className="w-full text-base text-muted-foreground border-b border-transparent hover:border-border focus:border-primary focus:outline-none bg-transparent resize-none transition-colors py-2"
+                className="w-full text-base text-muted-foreground border-b border-transparent hover:border-border focus:border-primary focus:outline-none bg-transparent resize-none transition-colors py-2 overflow-hidden"
                 placeholder="Form Description"
                 rows={1}
-                onInput={(e) => {
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                }}
             />
 
             <div className="pt-4 flex items-center gap-4">

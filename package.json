@@ -11,10 +11,14 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.555.0",
     "react": "^19.2.0",
+    "react-clock": "^6.0.0",
+    "react-datepicker": "^8.10.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.10.0",
+    "react-time-picker": "^8.0.2",
     "tailwind-merge": "^3.4.0",
     "zustand": "^5.0.9"
   },

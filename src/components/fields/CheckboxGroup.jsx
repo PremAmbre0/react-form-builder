@@ -6,10 +6,20 @@ export default function CheckboxGroup({ field, value, onChange, onBlur, error, a
 
     const handleCheckboxChange = (optionValue, checked) => {
         let newValues;
-        if (checked) {
-            newValues = [...selectedValues, optionValue];
+        if (config.multiSelect === false) {
+            // Single selection mode
+            if (checked) {
+                newValues = [optionValue];
+            } else {
+                newValues = [];
+            }
         } else {
-            newValues = selectedValues.filter(v => v !== optionValue);
+            // Multi selection mode (default)
+            if (checked) {
+                newValues = [...selectedValues, optionValue];
+            } else {
+                newValues = selectedValues.filter(v => v !== optionValue);
+            }
         }
         onChange(field.id, newValues);
     };
@@ -41,6 +51,31 @@ export default function CheckboxGroup({ field, value, onChange, onBlur, error, a
                         </label>
                     </div>
                 ))}
+                {config.allowOther && (
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id={`${field.id}-other`}
+                                checked={selectedValues.includes('other')}
+                                onChange={(e) => handleCheckboxChange('other', e.target.checked)}
+                                onBlur={() => onBlur(field.id)}
+                                className={`h-4 w-4 rounded border-input text-${accentColor} focus:ring-${accentColor}`}
+                                style={{ accentColor: `var(--${accentColor})` }}
+                            />
+                            <label htmlFor={`${field.id}-other`} className="text-sm cursor-pointer select-none">
+                                Other
+                            </label>
+                        </div>
+                        {selectedValues.includes('other') && (
+                            <input
+                                type="text"
+                                placeholder="Please specify"
+                                className={`w-full px-3 py-2 border rounded-md bg-background text-sm focus:outline-none transition-colors border-input focus:border-${accentColor}`}
+                            />
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );
