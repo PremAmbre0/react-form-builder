@@ -201,13 +201,13 @@ export default function FieldConfigEditor({ field, updateField }) {
                                 <input
                                     type="number"
                                     value={config.step || 1}
-                                    const range= (validation.max !== undefined ? validation.max : 100) - (validation.min !== undefined ? validation.min : 0);
-                                const maxStep = Math.max(0, range / 2); // Ensure not negative
-
-                                handleConfigChange('step', Math.min(parseFloat(e.target.value), maxStep));
-                                }}
-                                max={(validation.max !== undefined ? validation.max : 100) - (validation.min !== undefined ? validation.min : 0) / 2}
-                                className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
+                                    onChange={(e) => {
+                                        const range = (validation.max !== undefined ? validation.max : 100) - (validation.min !== undefined ? validation.min : 0);
+                                        const maxStep = Math.max(0, range / 2);
+                                        handleConfigChange('step', Math.min(parseFloat(e.target.value), maxStep));
+                                    }}
+                                    max={(validation.max !== undefined ? validation.max : 100) - (validation.min !== undefined ? validation.min : 0) / 2}
+                                    className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm focus:outline-none focus:border-primary"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-3">
