@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
 
-const AppMenu = ({ isOpen, onClose, triggerRef, children, className = '' }) => {
+const AppMenu = ({ isOpen, onClose, triggerRef, children, className = '', ...props }) => {
     const [position, setPosition] = useState({ top: -9999, left: -9999 });
     const [isPositioned, setIsPositioned] = useState(false);
     const menuRef = useRef(null);
@@ -103,7 +103,7 @@ const AppMenu = ({ isOpen, onClose, triggerRef, children, className = '' }) => {
                 visibility: isPositioned ? 'visible' : 'hidden',
             }}
         >
-            <div className={className}>
+            <div className={className} {...props}>
                 {children}
             </div>
         </div>,

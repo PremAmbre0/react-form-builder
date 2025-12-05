@@ -4,10 +4,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Calendar, X } from 'lucide-react';
 import '../../assets/styles/CustomDatePicker.css';
 import AppMenu from './AppMenu';
+import { getAccentColorHex } from '../../utils/colors';
 
-export default function AppDatePicker({ value, onChange, minDate, maxDate, placeholder = "Select date" }) {
+export default function AppDatePicker({ value, onChange, minDate, maxDate, placeholder = "Select date", accentColor = 'primary' }) {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
+    const accentHex = getAccentColorHex(accentColor);
 
     const handleChange = (date) => {
         if (date) {
@@ -56,7 +58,7 @@ export default function AppDatePicker({ value, onChange, minDate, maxDate, place
                 isOpen={isOpen}
                 onClose={() => setIsOpen(false)}
                 triggerRef={containerRef}
-                className="bg-popover border border-border rounded-md shadow-lg z-50"
+                style={{ '--accent-color': accentHex }}
             >
                 <DatePicker
                     selected={selectedDate}
