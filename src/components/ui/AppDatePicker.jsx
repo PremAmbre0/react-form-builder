@@ -36,7 +36,7 @@ export default function AppDatePicker({ value, onChange, minDate, maxDate, place
                     {value ? (
                         <span>{value}</span>
                     ) : (
-                        <span className="text-muted-foreground">{placeholder}</span>
+                        <span className={`text-${accentColor}/60`}>{placeholder}</span>
                     )}
                 </div>
                 <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
