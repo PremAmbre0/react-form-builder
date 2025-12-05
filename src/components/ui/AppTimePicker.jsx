@@ -2,6 +2,24 @@ import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { getAccentColorHex } from '../../utils/colors';
 import AppMenu from './AppMenu';
 
+const parseDate = (isoString) => {
+    if (!isoString) return null;
+    const date = new Date(isoString);
+    if (isNaN(date.getTime())) return null;
+
+    let h = date.getHours();
+    const m = date.getMinutes();
+    let p = 'AM';
+
+    if (h >= 12) {
+        p = 'PM';
+        if (h > 12) h -= 12;
+    }
+    if (h === 0) h = 12;
+
+    return { h, m, p };
+};
+
 export default function AppTimePicker({ value, onChange, onClose, accentColor, format = '12', triggerRef }) {
     const is24Hour = format === '24';
     const [selectedHour, setSelectedHour] = useState(is24Hour ? 0 : 12);
@@ -147,95 +165,92 @@ export default function AppTimePicker({ value, onChange, onClose, accentColor, f
         >
             <div
                 onMouseDown={(e) => e.preventDefault()} // Prevent focus loss on input when clicking picker
-                className="flex h-48 relative"
+                className="flex h-48 relative w-full"
             >
+                {/* Selection Highlight Bar */}
+                <div
+                    className="absolute top-1/2 left-0 w-full h-10 -translate-y-1/2 pointer-events-none transition-colors"
+                    style={{ backgroundColor: `var(--accent-color)`, opacity: 0.1 }}
+                />
 
-                <div className="flex h-48 relative">
-                    {/* Selection Highlight Bar */}
-                    <div
-                        className="absolute top-1/2 left-0 w-full h-10 -translate-y-1/2 pointer-events-none transition-colors"
-                        style={{ backgroundColor: `var(--accent-color)`, opacity: 0.1 }}
-                    />
-
-                    {/* Hours Column */}
-                    <div
-                        ref={hourRef}
-                        onScroll={(e) => handleScroll(e, hours, setSelectedHour, 'hour')}
-                        className="flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory border-r border-border/50 relative"
-                    >
-                        <div style={{ paddingTop: PADDING_Y, paddingBottom: PADDING_Y }}>
-                            {loopedHours.map((hour, i) => (
-                                <div
-                                    key={`h-${i}`}
-                                    onClick={(e) => handleClick(e, hour, hours, hourRef, 'hour')}
-                                    className={`h-10 flex items-center justify-center cursor-pointer snap-center transition-all duration-200 ${selectedHour === hour
-                                        ? 'font-bold text-lg scale-110 text-foreground'
-                                        : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
-                                        }`}
-                                >
-                                    {hour.toString().padStart(2, '0')}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Minutes Column */}
-                    <div
-                        ref={minuteRef}
-                        onScroll={(e) => handleScroll(e, minutes, setSelectedMinute, 'minute')}
-                        className={`flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory relative ${!is24Hour ? 'border-r border-border/50' : ''}`}
-                    >
-                        <div style={{ paddingTop: PADDING_Y, paddingBottom: PADDING_Y }}>
-                            {loopedMinutes.map((minute, i) => (
-                                <div
-                                    key={`m-${i}`}
-                                    onClick={(e) => handleClick(e, minute, minutes, minuteRef, 'minute')}
-                                    className={`h-10 flex items-center justify-center cursor-pointer snap-center transition-all duration-200 ${selectedMinute === minute
-                                        ? 'font-bold text-lg scale-110 text-foreground'
-                                        : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
-                                        }`}
-                                >
-                                    {minute.toString().padStart(2, '0')}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* AM/PM Column (Only for 12h format) */}
-                    {!is24Hour && (
-                        <div
-                            ref={periodRef}
-                            onScroll={(e) => {
-                                const scrollTop = e.target.scrollTop;
-                                const index = Math.round(scrollTop / ITEM_HEIGHT);
-                                const val = periods[index];
-                                if (val && val !== selectedPeriod) {
-                                    setSelectedPeriod(val);
-                                    emitChange(selectedHour, selectedMinute, val);
-                                }
-                            }}
-                            className="flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory relative"
-                        >
-                            <div style={{ paddingTop: PADDING_Y, paddingBottom: PADDING_Y }}>
-                                {periods.map((period, i) => (
-                                    <div
-                                        key={period}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            periodRef.current.scrollTo({ top: i * ITEM_HEIGHT, behavior: 'smooth' });
-                                        }}
-                                        className={`h-10 flex items-center justify-center cursor-pointer snap-center transition-all duration-200 ${selectedPeriod === period
-                                            ? 'font-bold text-lg scale-110 text-foreground'
-                                            : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
-                                            }`}
-                                    >
-                                        {period}
-                                    </div>
-                                ))}
+                {/* Hours Column */}
+                <div
+                    ref={hourRef}
+                    onScroll={(e) => handleScroll(e, hours, setSelectedHour, 'hour')}
+                    className="flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory border-r border-border/50 relative"
+                >
+                    <div style={{ paddingTop: PADDING_Y, paddingBottom: PADDING_Y }}>
+                        {loopedHours.map((hour, i) => (
+                            <div
+                                key={`h-${i}`}
+                                onClick={(e) => handleClick(e, hour, hours, hourRef, 'hour')}
+                                className={`h-10 flex items-center justify-center cursor-pointer snap-center transition-all duration-200 ${selectedHour === hour
+                                    ? 'font-bold text-lg scale-110 text-foreground'
+                                    : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
+                                    }`}
+                            >
+                                {hour.toString().padStart(2, '0')}
                             </div>
-                        </div>
-                    )}
+                        ))}
+                    </div>
                 </div>
+
+                {/* Minutes Column */}
+                <div
+                    ref={minuteRef}
+                    onScroll={(e) => handleScroll(e, minutes, setSelectedMinute, 'minute')}
+                    className={`flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory relative ${!is24Hour ? 'border-r border-border/50' : ''}`}
+                >
+                    <div style={{ paddingTop: PADDING_Y, paddingBottom: PADDING_Y }}>
+                        {loopedMinutes.map((minute, i) => (
+                            <div
+                                key={`m-${i}`}
+                                onClick={(e) => handleClick(e, minute, minutes, minuteRef, 'minute')}
+                                className={`h-10 flex items-center justify-center cursor-pointer snap-center transition-all duration-200 ${selectedMinute === minute
+                                    ? 'font-bold text-lg scale-110 text-foreground'
+                                    : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
+                                    }`}
+                            >
+                                {minute.toString().padStart(2, '0')}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* AM/PM Column (Only for 12h format) */}
+                {!is24Hour && (
+                    <div
+                        ref={periodRef}
+                        onScroll={(e) => {
+                            const scrollTop = e.target.scrollTop;
+                            const index = Math.round(scrollTop / ITEM_HEIGHT);
+                            const val = periods[index];
+                            if (val && val !== selectedPeriod) {
+                                setSelectedPeriod(val);
+                                emitChange(selectedHour, selectedMinute, val);
+                            }
+                        }}
+                        className="flex-1 overflow-y-auto scrollbar-hide snap-y snap-mandatory relative"
+                    >
+                        <div style={{ paddingTop: PADDING_Y, paddingBottom: PADDING_Y }}>
+                            {periods.map((period, i) => (
+                                <div
+                                    key={period}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        periodRef.current.scrollTo({ top: i * ITEM_HEIGHT, behavior: 'smooth' });
+                                    }}
+                                    className={`h-10 flex items-center justify-center cursor-pointer snap-center transition-all duration-200 ${selectedPeriod === period
+                                        ? 'font-bold text-lg scale-110 text-foreground'
+                                        : 'text-muted-foreground/60 hover:text-[var(--accent-color)]'
+                                        }`}
+                                >
+                                    {period}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </AppMenu>
     );

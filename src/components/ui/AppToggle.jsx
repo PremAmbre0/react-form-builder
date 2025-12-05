@@ -52,8 +52,8 @@ const AppToggle = ({
                     />
                     <span
                         className={`
-                            pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md ring-0 transition-transform
-                            ${value ? 'translate-x-6' : 'translate-x-0'}
+                            pointer-events-none block h-5 w-5 rounded-full bg-background shadow-md border border-gray-200 ring-0 transition-transform relative z-10
+                            ${value ? 'translate-x-[26px]' : 'translate-x-[-2px]'}
                             ${toggleStyle === 'inset' ? 'scale-75' : ''}
                         `}
                     />
