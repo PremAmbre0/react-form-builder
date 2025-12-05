@@ -56,7 +56,7 @@ export default function AppDatePicker({ value, onChange, minDate, maxDate, place
                 isOpen={isOpen}
                 onClose={() => setIsOpen(false)}
                 triggerRef={containerRef}
-                className="bg-popover border border-border rounded-md shadow-lg p-2 z-50"
+                className="bg-popover border border-border rounded-md shadow-lg z-50"
             >
                 <DatePicker
                     selected={selectedDate}
