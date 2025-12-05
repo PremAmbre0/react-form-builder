@@ -33,6 +33,22 @@ const FIELD_COMPONENTS = {
     time: TimeInput
 };
 
+const InteractiveField = ({ component: Component, field, accentColor }) => {
+    const [value, setValue] = React.useState(field.type === 'checkboxGroup' ? [] : '');
+
+    return (
+        <Component
+            field={field}
+            value={value}
+            onChange={(id, newValue) => setValue(newValue)}
+            onBlur={() => { }}
+            error={null}
+            accentColor={accentColor}
+            hideLabel={true}
+        />
+    );
+};
+
 export default function FieldList() {
     const { activeForm, removeField, selectField, selectedFieldId, openSidebar, setInsertionIndex, reorderFields } = useFormStore();
     const [isDragging, setIsDragging] = React.useState(false);
@@ -172,15 +188,12 @@ export default function FieldList() {
                                                             </div>
 
                                                             {/* 2:2 and 2:3 Whole Input */}
-                                                            <div className="col-start-2 col-span-2 row-start-2 min-w-0 pointer-events-none">
-                                                                <Component
+                                                            {/* Removed pointer-events-none to allow interaction */}
+                                                            <div className="col-start-2 col-span-2 row-start-2 min-w-0">
+                                                                <InteractiveField
+                                                                    component={Component}
                                                                     field={field}
-                                                                    value=""
-                                                                    onChange={() => { }}
-                                                                    onBlur={() => { }}
-                                                                    error={null}
                                                                     accentColor={activeForm.accentColor}
-                                                                    hideLabel={true}
                                                                 />
                                                             </div>
                                                         </div>

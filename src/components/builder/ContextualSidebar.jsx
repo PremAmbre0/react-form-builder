@@ -1,16 +1,19 @@
 import React from 'react';
-import useFormStore from '../../store/useFormStore';
 import { X } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import FieldPicker from './FieldPicker';
 import FieldConfigEditor from './FieldConfigEditor';
 import { FIELD_DEFINITIONS } from '../../constants/fieldSchemas';
+import useScrollLock from '../../hooks/useScrollLock';
+import useFormStore from '../../store/useFormStore';
 
 export default function ContextualSidebar() {
     const { sidebarMode, closeSidebar, activeForm, selectedFieldId, updateField } = useFormStore();
 
     const selectedField = activeForm?.fields.find(f => f.id === selectedFieldId);
     const isOpen = sidebarMode !== null;
+
+    useScrollLock(isOpen);
 
     return (
         <>

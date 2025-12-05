@@ -1,8 +1,11 @@
 import { CheckCircle, X, Copy, Check } from 'lucide-react';
 import { useState } from 'react';
+import useScrollLock from '../../hooks/useScrollLock';
 
 export default function SubmissionModal({ isOpen, onClose, data }) {
     const [copied, setCopied] = useState(false);
+
+    useScrollLock(isOpen);
 
     if (!isOpen) return null;
 
