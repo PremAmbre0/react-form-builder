@@ -26,7 +26,7 @@ export default function HomePage() {
     const filteredAndSortedForms = useMemo(() => {
         return allForms
             .filter(form =>
-                form.title.toLowerCase().includes(searchQuery.toLowerCase())
+                (form.title || '').toLowerCase().includes(searchQuery.toLowerCase())
             )
             .sort((a, b) => {
                 switch (sortBy) {
@@ -49,13 +49,13 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 {/* Search */}
                 <div className="relative w-full md:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 pointer-events-none" />
                     <input
                         type="text"
                         placeholder="Search forms..."
                         value={searchQuery}
-                        disabled={!hasForms}
-                        className={`w-full pl-9 pr-8 py-2 h-10 rounded-md border bg-background text-sm focus:outline-none transition-colors ${searchQuery ? 'border-primary' : 'border-input focus:border-primary'} ${!hasForms ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className={`w-full pl-9 pr-8 py-2 h-10 rounded-md border bg-background text-sm focus:outline-none transition-colors ${searchQuery ? 'border-primary' : 'border-input focus:border-primary'}`}
                     />
                     {searchQuery && (
                         <button
@@ -69,7 +69,7 @@ export default function HomePage() {
 
                 <div className="flex flex-row w-full md:w-auto gap-3">
                     {/* Sort Dropdown */}
-                    <div className={`w-auto md:w-40 shrink-0 ${!hasForms ? 'opacity-50 pointer-events-none' : ''}`}>
+                    <div className="w-auto md:w-40 shrink-0">
                         <AppDropdown
                             value={sortBy}
                             options={sortOptions}
