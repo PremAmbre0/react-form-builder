@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check, X } from 'lucide-react';
 
-export default function DropdownInput({ field, value, onChange, onBlur, error, accentColor, isLast }) {
+export default function DropdownInput({ field, value, onChange, onBlur, error, accentColor, isLast, hideLabel }) {
     const { config, validation } = field;
     const isMulti = config.multiSelect;
     const [isOpen, setIsOpen] = useState(false);
@@ -66,14 +66,16 @@ export default function DropdownInput({ field, value, onChange, onBlur, error, a
     return (
         <div className="flex flex-col mb-8" ref={containerRef}>
             {/* Label and Hint Group */}
-            <div className="mb-2">
-                <div className="flex justify-between items-center">
-                    <label htmlFor={field.id} className="block text-sm font-medium break-words">
-                        {config.label} {validation.required && <span className="text-destructive">*</span>}
-                    </label>
+            {!hideLabel && (
+                <div className="mb-2">
+                    <div className="flex justify-between items-center">
+                        <label htmlFor={field.id} className="block text-sm font-medium break-words">
+                            {config.label} {validation.required && <span className="text-destructive">*</span>}
+                        </label>
+                    </div>
+                    {config.helpText && <div className="text-xs text-muted-foreground">{config.helpText}</div>}
                 </div>
-                {config.helpText && <div className="text-xs text-muted-foreground">{config.helpText}</div>}
-            </div>
+            )}
 
             {/* Input and Error Group */}
             <div className="relative">

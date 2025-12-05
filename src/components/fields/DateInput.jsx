@@ -5,7 +5,7 @@ import { Calendar, X } from 'lucide-react';
 import '../../assets/styles/CustomDatePicker.css';
 import { getAccentColorHex } from '../../utils/colors';
 
-export default function DateInput({ field, value, onChange, onBlur, error, accentColor, isLast }) {
+export default function DateInput({ field, value, onChange, onBlur, error, accentColor, isLast, hideLabel }) {
     const { config, validation } = field;
     const [portalContainer, setPortalContainer] = useState(null);
     const accentHex = getAccentColorHex(accentColor);
@@ -22,14 +22,16 @@ export default function DateInput({ field, value, onChange, onBlur, error, accen
     return (
         <div className="flex flex-col mb-8">
             {/* Label and Hint Group */}
-            <div className="mb-2">
-                <div className="flex justify-between items-center">
-                    <label htmlFor={field.id} className="block text-sm font-medium">
-                        {config.label} {validation.required && <span className="text-destructive">*</span>}
-                    </label>
+            {!hideLabel && (
+                <div className="mb-2">
+                    <div className="flex justify-between items-center">
+                        <label htmlFor={field.id} className="block text-sm font-medium">
+                            {config.label} {validation.required && <span className="text-destructive">*</span>}
+                        </label>
+                    </div>
+                    {config.helpText && <div className="text-xs text-muted-foreground">{config.helpText}</div>}
                 </div>
-                {config.helpText && <div className="text-xs text-muted-foreground">{config.helpText}</div>}
-            </div>
+            )}
 
             {/* Input and Error Group */}
             <div className="relative">

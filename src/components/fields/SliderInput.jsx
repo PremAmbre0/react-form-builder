@@ -2,13 +2,13 @@ import React from 'react';
 import AppSlider from '../ui/AppSlider';
 import { ACCENT_COLORS } from '../../constants/colors';
 
-export default function SliderInput({ field, value, onChange, onBlur, error, accentColor, isLast, disabled }) {
+export default function SliderInput({ field, value, onChange, onBlur, error, accentColor, isLast, disabled, hideLabel }) {
     const { config, validation } = field;
     const accentColorHex = ACCENT_COLORS.find(c => c.class === accentColor)?.value;
 
     return (
         <AppSlider
-            label={config.label}
+            label={hideLabel ? null : config.label}
             value={value}
             onChange={(val) => onChange(field.id, val)}
             min={validation.min}
@@ -18,7 +18,7 @@ export default function SliderInput({ field, value, onChange, onBlur, error, acc
             error={error}
             required={validation.required}
             disabled={disabled}
-            helpText={config.helpText}
+            helpText={hideLabel ? null : config.helpText}
             accentColor={accentColor}
             accentColorHex={accentColorHex}
             className="mb-8"

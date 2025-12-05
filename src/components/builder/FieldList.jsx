@@ -115,43 +115,38 @@ export default function FieldList() {
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 selectField(field.id);
-                                                                // On desktop, open settings immediately. On mobile, just select.
                                                                 if (window.matchMedia('(min-width: 1024px)').matches) {
                                                                     openSidebar('settings');
                                                                 }
                                                             }}
                                                             className={cn(
-                                                                "relative transition-all rounded-lg p-3 md:p-4 border bg-card flex gap-3 items-start",
+                                                                "relative transition-all rounded-lg p-3 md:p-4 border bg-card grid grid-cols-[auto_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-2 items-start",
                                                                 isSelected
                                                                     ? "border-primary shadow-sm"
                                                                     : cn("border-transparent", !isDragging && "group-hover/field:border-primary"),
                                                                 snapshot.isDragging && "shadow-xl border-primary/50 scale-95 opacity-90"
                                                             )}
                                                         >
-                                                            {/* Drag Handle */}
+                                                            {/* 1:1 Drag Icon */}
                                                             <div
                                                                 {...provided.dragHandleProps}
-                                                                className="mt-1 text-muted-foreground/50 hover:text-foreground cursor-grab active:cursor-grabbing transition-colors"
+                                                                className="col-start-1 row-start-1 text-muted-foreground/50 hover:text-foreground cursor-grab active:cursor-grabbing transition-colors pt-1"
                                                             >
                                                                 <GripVertical size={20} />
                                                             </div>
 
-                                                            {/* Field Preview */}
-                                                            <div className="flex-1 min-w-0 pointer-events-none">
-                                                                <Component
-                                                                    field={field}
-                                                                    value=""
-                                                                    onChange={() => { }}
-                                                                    onBlur={() => { }}
-                                                                    error={null}
-                                                                    accentColor={activeForm.accentColor}
-                                                                />
+                                                            {/* 1:2 Label and Hint */}
+                                                            <div className="col-start-2 row-start-1 min-w-0">
+                                                                <label className="block text-sm font-medium break-words">
+                                                                    {field.config.label} {field.validation.required && <span className="text-destructive">*</span>}
+                                                                </label>
+                                                                {field.config.helpText && <div className="text-xs text-muted-foreground mt-1 break-words">{field.config.helpText}</div>}
                                                             </div>
 
-                                                            {/* Actions */}
+                                                            {/* 1:3 Actions */}
                                                             <div className={cn(
-                                                                "flex gap-2 transition-opacity shrink-0",
-                                                                isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                                                                "col-start-3 row-start-1 flex gap-2 transition-opacity shrink-0",
+                                                                isSelected ? "opacity-100" : "opacity-0 group-hover/field:opacity-100"
                                                             )}>
                                                                 <button
                                                                     onClick={(e) => {
@@ -174,6 +169,19 @@ export default function FieldList() {
                                                                 >
                                                                     <Trash2 size={18} className="transition-all group-hover/btn:stroke-[2.5px]" />
                                                                 </button>
+                                                            </div>
+
+                                                            {/* 2:2 and 2:3 Whole Input */}
+                                                            <div className="col-start-2 col-span-2 row-start-2 min-w-0 pointer-events-none">
+                                                                <Component
+                                                                    field={field}
+                                                                    value=""
+                                                                    onChange={() => { }}
+                                                                    onBlur={() => { }}
+                                                                    error={null}
+                                                                    accentColor={activeForm.accentColor}
+                                                                    hideLabel={true}
+                                                                />
                                                             </div>
                                                         </div>
 

@@ -1,12 +1,12 @@
 import React from 'react';
 import AppRating from '../ui/AppRating';
 
-export default function RatingInput({ field, value, onChange, onBlur, error, accentColor, isLast, disabled }) {
+export default function RatingInput({ field, value, onChange, onBlur, error, accentColor, isLast, disabled, hideLabel }) {
     const { config, validation } = field;
 
     return (
         <AppRating
-            label={config.label}
+            label={hideLabel ? null : config.label}
             value={value}
             onChange={(val) => onChange(field.id, val)}
             maxStars={config.maxStars}
@@ -15,7 +15,7 @@ export default function RatingInput({ field, value, onChange, onBlur, error, acc
             error={error}
             required={validation.required}
             disabled={disabled}
-            helpText={config.helpText}
+            helpText={hideLabel ? null : config.helpText}
             accentColor={accentColor}
             className="mb-8"
         />

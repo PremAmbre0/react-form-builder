@@ -3,7 +3,7 @@ import { Clock, X } from 'lucide-react';
 import AppTimePicker from '../ui/AppTimePicker';
 import '../../assets/styles/CustomDatePicker.css';
 
-export default function TimeInput({ field, value, onChange, onBlur, error, accentColor, isLast }) {
+export default function TimeInput({ field, value, onChange, onBlur, error, accentColor, isLast, hideLabel }) {
     const { config, validation } = field;
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const containerRef = useRef(null);
@@ -52,14 +52,16 @@ export default function TimeInput({ field, value, onChange, onBlur, error, accen
     return (
         <div className="flex flex-col mb-8" ref={containerRef}>
             {/* Label and Hint Group */}
-            <div className="mb-2">
-                <div className="flex justify-between items-center">
-                    <label htmlFor={field.id} className="block text-sm font-medium">
-                        {config.label} {validation.required && <span className="text-destructive">*</span>}
-                    </label>
+            {!hideLabel && (
+                <div className="mb-2">
+                    <div className="flex justify-between items-center">
+                        <label htmlFor={field.id} className="block text-sm font-medium">
+                            {config.label} {validation.required && <span className="text-destructive">*</span>}
+                        </label>
+                    </div>
+                    {config.helpText && <div className="text-xs text-muted-foreground">{config.helpText}</div>}
                 </div>
-                {config.helpText && <div className="text-xs text-muted-foreground">{config.helpText}</div>}
-            </div>
+            )}
 
             {/* Input and Error Group */}
             <div className="relative">

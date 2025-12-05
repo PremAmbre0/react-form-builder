@@ -1,7 +1,7 @@
 import React from 'react';
 import AppTextInput from '../ui/AppTextInput';
 
-export default function TextInput({ field, value, onChange, onBlur, error, accentColor, isLast, disabled }) {
+export default function TextInput({ field, value, onChange, onBlur, error, accentColor, isLast, disabled, hideLabel }) {
     const { config, validation } = field;
 
     const handleClear = () => {
@@ -10,7 +10,7 @@ export default function TextInput({ field, value, onChange, onBlur, error, accen
 
     return (
         <AppTextInput
-            label={config.label}
+            label={hideLabel ? null : config.label}
             value={value}
             onChange={(e) => onChange(field.id, e.target.value)}
             onBlur={() => onBlur(field.id)}
@@ -22,7 +22,7 @@ export default function TextInput({ field, value, onChange, onBlur, error, accen
             inputMode={config.validationType === 'number' ? 'numeric' : undefined}
             pattern={config.validationType === 'number' ? '[0-9]*' : undefined}
             onClear={handleClear}
-            helpText={config.helpText}
+            helpText={hideLabel ? null : config.helpText}
             accentColor={accentColor}
             className="mb-8"
             id={field.id}
