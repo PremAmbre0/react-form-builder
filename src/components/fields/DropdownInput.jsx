@@ -49,7 +49,7 @@ export default function DropdownInput({ field, value, onChange, onBlur, error, a
     };
 
     const getDisplayLabel = () => {
-        if (!selectedValues.length) return 'Select option...';
+        if (!selectedValues.length) return config.placeholder || 'Select option...';
 
         if (isMulti) {
             if (selectedValues.length === 1) {
@@ -90,7 +90,7 @@ export default function DropdownInput({ field, value, onChange, onBlur, error, a
                         style={isOpen ? { borderColor: `var(--${accentColor})` } : {}}
                     >
                         <div className="flex items-center gap-2 overflow-hidden">
-                            <span className={`truncate ${selectedValues.length ? 'text-foreground' : 'text-muted-foreground'}`}>
+                            <span className={`truncate ${selectedValues.length ? 'text-foreground' : `text-${accentColor}/60`}`}>
                                 {getDisplayLabel()}
                             </span>
                         </div>

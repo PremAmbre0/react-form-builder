@@ -49,8 +49,8 @@ export default function DateInput({ field, value, onChange, onBlur, error, accen
                         minDate={validation.minDate ? new Date(validation.minDate) : null}
                         maxDate={validation.maxDate ? new Date(validation.maxDate) : null}
                         className={`w-full px-3 py-2 pl-10 ${value ? 'pr-8' : ''} border rounded-md bg-background text-sm focus:outline-none transition-colors cursor-pointer ${error
-                            ? 'border-destructive focus:border-destructive'
-                            : `border-input focus:border-[var(--color-primary)]`
+                            ? 'border-destructive focus:border-destructive placeholder:text-destructive/60'
+                            : `border-input focus:border-${accentColor} placeholder:text-${accentColor}/60`
                             }`}
                         wrapperClassName="w-full"
                         showPopperArrow={false}
