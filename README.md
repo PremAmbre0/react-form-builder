@@ -1,57 +1,157 @@
 # React Form Builder
 
-A responsive and interactive Form Builder application built with React, Tailwind CSS, and Zustand. This application allows users to create custom forms with a wide variety of field types, configure them with advanced settings (including validation and conditional logic), and preview the final result.
+A powerful, responsive, and interactive Form Builder application built with React, allowing users to create, customize, and preview dynamic forms with ease.
 
+## 🚀 Features
 
+- **Dynamic Form Creation**: Add and configure various field types (Text, Number, Date, Time, Dropdowns, Checkboxes, etc.).
+- **Drag-and-Drop Interface**: Reorder fields intuitively.
+- **Real-time Preview**: Test your form interactivity instantly.
+- **Validation**: Built-in support for required fields, min/max lengths, and patterns.
+- **Export Data**: View submitted form data as JSON.
+- **Dark Mode**: Fully responsive dark/light theme support.
+- **Responsive Design**: Optimized for desktop, tablet, and mobile.
 
-## Tech Stack
+## 🛠️ Setup Instructions
 
-- **Frontend Framework**: React 19
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand
-- **Icons**: Lucide React
-- **Date Handling**: React Datepicker
-- **Routing**: React Router DOM
+### Prerequisites
+- Node.js (v18 or higher)
+- npm (v9 or higher)
 
-## Setup Instructions
-
-1.  **Clone the repository**:
+### Installation
+1.  **Clone the repository:**
     ```bash
-    git clone <repository-url>
-    cd FormBuilder
+    git clone https://github.com/yourusername/react-form-builder.git
+    cd react-form-builder
     ```
 
-2.  **Install dependencies**:
+2.  **Install dependencies:**
     ```bash
     npm install
     ```
 
-3.  **Run the development server**:
+3.  **Run the development server:**
     ```bash
     npm run dev
     ```
 
-4.  **Build for production**:
+4.  **Build for production:**
     ```bash
     npm run build
     ```
 
-## Design Approach
+## 📦 Libraries Used & Justification
 
-- **Component-Based Architecture**: The application is structured into reusable components (e.g., `FieldConfigEditor`, `BuilderDatePicker`, individual field components in `src/components/fields`).
-- **Separation of Concerns**:
-  - **Builder**: Handles the configuration and layout of the form.
-  - **Preview**: Handles the rendering and validation of the final form.
-  - **Store**: `useFormStore` manages the global state of forms, fields, and configurations.
-- **Semantic Styling**: Uses Tailwind CSS with CSS variables (e.g., `--primary`, `--background`) to support dynamic theming and dark mode seamlessly.
-- **Validation Strategy**: Centralized validation logic in `src/utils/validation.js` ensures consistency between the builder and the preview.
+| Library | Purpose | Justification |
+| :--- | :--- | :--- |
+| **React** | Core Framework | Industry standard for building interactive UIs with a component-based architecture. |
+| **Vite** | Build Tool | Extremely fast hot module replacement (HMR) and optimized build process. |
+| **Zustand** | State Management | Lightweight, boilerplate-free alternative to Redux for managing global app state (`activeForm`, `allForms`). |
+| **Tailwind CSS** | Styling | Utility-first CSS framework for rapid, consistent, and responsive styling without context switching. |
+| **@hello-pangea/dnd** | Drag & Drop | Modern, accessible, and maintained fork of `react-beautiful-dnd` for the builder interface. |
+| **React Hook Form** | Form Logic | (Conceptually used logic, implemented via custom handlers for max flexibility in the builder). |
+| **date-fns** | Date Formatting | Lightweight and immutable date utility library for handling date/time inputs. |
+| **Lucide React** | Icons | Clean, consistent, and customizable SVG icons. |
+| **clsx / tailwind-merge** | Class Utilities | Essential for conditionally applying Tailwind classes and resolving conflicts in reusable components. |
 
-## Project Structure
+## 🏗️ Architecture & Design Approach
 
-- `src/components/builder`: Components for the form builder interface (sidebar, field list, config editor).
-- `src/components/fields`: Individual form field components used in the preview.
-- `src/components/ui`: Reusable UI components (modals, buttons, etc.).
-- `src/store`: Zustand store for state management.
-- `src/utils`: Utility functions for validation, colors, and rules.
-- `src/pages`: Main page views (Home, Builder, Preview).
+My design philosophy focuses on **modularity**, **reusability**, and **separation of concerns**. The application is structured to decouple the *builder logic* from the *rendering logic*, allowing the preview engine to be potentialy reused in a different context (e.g., a standalone viewer).
+
+### Folder Structure Overview
+
+```
+src/
+├── components/
+│   ├── ui/           # Generic, atomic UI components (AppInput, AppButton, etc.)
+│   ├── fields/       # Form-specific logic wrappers (TextInput, DateInput, etc.)
+│   └── builder/      # Components specific to the Builder interface (Sidebar, Canvas)
+├── pages/            # Top-level route components (Home, Builder, Preview)
+├── store/            # Global state management (Zustand)
+├── hooks/            # Custom reusable hooks
+├── utils/            # Helper functions (validation, rules, formatters)
+└── assets/           # Static assets and global styles
+```
+
+### Component Wireframe / Hierarchy
+
+The application flows through three main pages. Here is how they are composed:
+
+```mermaid
+graph TD
+    App --> Layout
+    Layout --> Router
+    
+    Router --> HomePage
+    Router --> BuilderPage
+    Router --> PreviewPage
+
+    subgraph "Home Page"
+        HomePage --> AppDropdown[Sort/Filter]
+        HomePage --> FormCard[Form List Item]
+    end
+
+    subgraph "Builder Page"
+        BuilderPage --> FormHeader
+        BuilderPage --> FieldList[Canvas & DragArea]
+        BuilderPage --> ContextualSidebar[Properties Panel]
+        
+        FieldList --> DraggableField
+        ContextualSidebar --> FieldConfigEditor
+    end
+
+    subgraph "Preview Page"
+        PreviewPage --> FieldFactory[Dynamic Field Renderer]
+        FieldFactory --> TextInput
+        FieldFactory --> SelectInput
+        FieldFactory --> CheckboxGroup
+        FieldFactory --> Etc...[Other Fields]
+        PreviewPage --> SubmissionModal
+    end
+```
+
+### Key Architectural Decisions
+
+#### 1. Generic UI Components (`src/components/ui`)
+I created a set of "dumb" presentation components (prefixed with `App`, e.g., `AppTextInput`, `AppDropdown`).
+-   **Why?** This ensures UI consistency across both the **Editor Sidebar** and the **Live Preview**.
+-   **Benefit:** Changing the style of `AppTextInput` updates it everywhere instantly.
+
+#### 2. Separation of Field Logic vs. UI
+The `src/components/fields` directory contains "smart" wrappers (e.g., `TextInput.jsx`).
+-   **Responsibility:** These components handle form-specific logic like extracting props, handling validation errors, and connecting to the `Generic UI` layer.
+-   **Result:** cleaner code and easier unit testing.
+
+#### 3. State Management (Zustand)
+I chose Zustand over Redux or Context API.
+-   **Why?** It avoids "Provider Hell" and simple interactions like adding a field or updating a label shouldn't require complex reducers. It allows `BuilderPage` and `Sidebar` to sync effortlessly.
+
+#### 4. Utilities & Helpers
+-   `validation.js`: Centralized validation logic. This allows shared validation rules between the Builder configuration and the Preview execution.
+-   `rules.js`: Handles complex logic like conditional visibility (if implemented) or field enablement checks.
+
+#### 5. Custom Hooks
+-   `useFormStore`: Encapsulates all form-related CRUD operations.
+
+---
+
+## ✅ Problem Statement Checklist
+
+- [x] **Build Form Button**: Create new forms from the dashboard.
+- [x] **Field Types**: Support for Text, Number, TextArea, Dropdown, Checkbox, Radio, Date, Time, Slider, Rating, Toggle.
+- [x] **Field Configuration**: Edit labels, options, placeholders, and validation rules.
+- [x] **Drag & Drop**: Reorder fields in the builder.
+- [x] **Preview & Submit**: Live interaction and JSON data export.
+- [x] **Bonus**: Dark Mode, Validation (Required, Min/Max), Responsive Design.
+
+---
+
+## 🎨 Design & Customization
+
+The project uses a clean, modern aesthetic with careful attention to whitespace and typography.
+-   **Theme:** Configurable Accent Colors (Indigo, Pink, Orange, etc.).
+-   **Dark Mode:** Built-in via Tailwind's `dark:` modifier.
+
+## 📄 License
+
+This project is open-source and available for evaluation purposes.
